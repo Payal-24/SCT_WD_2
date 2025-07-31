@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stopwatch App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background-color: #f0f4f8;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    .timer {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #laps {
+      margin-top: 2rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    #laps li {
+      padding: 0.4rem;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stopwatch Web Application</h1>
+  <div class="timer" id="display">00:00:00</div>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="pauseTimer()">Pause</button>
+  <button onclick="resetTimer()">Reset</button>
+  <button onclick="recordLap()">Lap</button>
+
+  <ul id="laps"></ul>
+
+  <script>
+    let startTime = null;
+    let running = false;
+    let elapsed = 0;
+    let interval;
+
+    function format(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(totalSeconds % 60).padStart(2, '0');
+      return `${hrs}:${mins}:${secs}`;
+    }
+
+    function updateDisplay() {
+      const now = Date.now();
+      const time = running ? now - startTime + elapsed : elapsed;
+      document.getElementById('display').textContent = format(time);
+    }
+
+    function startTimer() {
+      if (!running) {
+        startTime = Date.now();
+        interval = setInterval(updateDisplay, 500);
+        running = true;
+      }
+    }
+
+    function pauseTimer() {
+      if (running) {
+        clearInterval(interval);
+        elapsed += Date.now() - startTime;
+        running = false;
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(interval);
+      running = false;
+      startTime = null;
+      elapsed = 0;
+      document.getElementById('display').textContent = '00:00:00';
+      document.getElementById('laps').innerHTML = '';
+    }
+
+    function recordLap() {
+      if (running) {
+        const lapTime = format(Date.now() - startTime + elapsed);
+        const li = document.createElement('li');
+        li.textContent = `Lap ${document.getElementById('laps').children.length + 1}: ${lapTime}`;
+        document.getElementById('laps').appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>
