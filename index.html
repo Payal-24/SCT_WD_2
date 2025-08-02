@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Add jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Add Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 </head>
-<link rel="stylesheet" href="style.css">
 
 <body>
  <div class="container">
@@ -155,7 +159,7 @@
   // When split-Button is clicked:
   $('#split').click(function() {
     // if mode = 1 (on)
-    if (mode = 1) {
+    if (mode === 1) {
       // stop loop
       clearInterval(loop);
       // reset lapCounter
