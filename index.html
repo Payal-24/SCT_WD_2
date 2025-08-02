@@ -1,112 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Stopwatch App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background-color: #f0f4f8;
-    }
-    h1 {
-      margin-bottom: 2rem;
-    }
-    .timer {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-    }
-    button {
-      padding: 0.8rem 1.5rem;
-      margin: 0.5rem;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #laps {
-      margin-top: 2rem;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-    }
-    #laps li {
-      padding: 0.4rem;
-      border-bottom: 1px solid #ccc;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
+<link rel="stylesheet" href="style.css">
+
 <body>
-  <h1>Stopwatch Web Application</h1>
-  <div class="timer" id="display">00:00:00</div>
-  <button onclick="startTimer()">Start</button>
-  <button onclick="pauseTimer()">Pause</button>
-  <button onclick="resetTimer()">Reset</button>
-  <button onclick="recordLap()">Lap</button>
+ <div class="container">
+  <!-- Page Header -->
+  <div id="page-header" class="page-header">
+    <span>St</span><img src="https://res.cloudinary.com/dftignrf8/image/upload/v1480901935/stopwatch_st153j.png"><span>pwatch</span>
+  </div>
+  <!-- Stopwatch -->
+  <div class="jumbotron">
 
-  <ul id="laps"></ul>
+    <div id="stopwatch">
+      <!-- Stopwatch Timers -->
+      <div id="time">
+        <span id="timeHour">00</span>:<span id="timeMinute">00</span>:<span id="timeSec">00</span>.<span id="timeCsec">00</span>
+      </div>
+      <div id="lap">
+        <span id="lapHour">00</span>:<span id="lapMinute">00</span>:<span id="lapSec">00</span>.<span id="lapCsec">00</span>
+      </div>
+    </div>
+    <!-- Stopwatch Controls -->
+    <div class="container">
+      <div class="controls">
+        <button type="button" id="startStop" class="btn-controls">
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                <span class="sr-only">Start</span>
+              </button>
+        <button type="button" id="split" class="btn-controls">Lap</button>
+        <button type="button" id="reset" class="btn-controls">Reset</button>
+      </div>
+    </div>
 
-  <script>
-    let startTime = null;
-    let running = false;
-    let elapsed = 0;
-    let interval;
+  </div>
+  <!-- Lap Times -->
+  <div id="lapTable" class="container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Lap</th>
+          <th>Interval</th>
+          <th>Total</th>
+          <th>Time Recorded</th>
+        </tr>
+      </thead>
+      <tbody id="laptimes">
+        <!-- print lapTimeDetails here -->
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    function format(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-      const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-      const secs = String(totalSeconds % 60).padStart(2, '0');
-      return `${hrs}:${mins}:${secs}`;
-    }
-
-    function updateDisplay() {
-      const now = Date.now();
-      const time = running ? now - startTime + elapsed : elapsed;
-      document.getElementById('display').textContent = format(time);
-    }
-
-    function startTimer() {
-      if (!running) {
-        startTime = Date.now();
-        interval = setInterval(updateDisplay, 500);
-        running = true;
-      }
-    }
-
-    function pauseTimer() {
-      if (running) {
-        clearInterval(interval);
-        elapsed += Date.now() - startTime;
-        running = false;
-      }
-    }
-
-    function resetTimer() {
-      clearInterval(interval);
-      running = false;
-      startTime = null;
-      elapsed = 0;
-      document.getElementById('display').textContent = '00:00:00';
-      document.getElementById('laps').innerHTML = '';
-    }
-
-    function recordLap() {
-      if (running) {
-        const lapTime = format(Date.now() - startTime + elapsed);
-        const li = document.createElement('li');
-        li.textContent = `Lap ${document.getElementById('laps').children.length + 1}: ${lapTime}`;
-        document.getElementById('laps').appendChild(li);
-      }
-    }
-  </script>
+<!-- Logo credits: Clock graphic by <a href="http://www.flaticon.com/authors/icomoon">Icomoon</a> from <a href="http://www.flaticon.com/">Flaticon</a> is licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>. Made with <a href="http://logomakr.com" title="Logo Maker">Logo Maker</a>--> 
+<footer class="footer">
+  <p>Created by Payal | <a href="https://github.com/Payal-24" target="_blank">GitHub</a></p>
+</footer>
 </body>
+<script>
+  $(function() {
+  // Variables:
+  var mode = 0; // App mode: 0 when watch has not been started
+  var timeCounter = 0; // Time counter
+  var lapCounter = 0; // Lap time counter
+  var lapNumber = 0; // Number of Laps
+  var loop; // Variable for setInterval
+  var date; // Variable for current date and time
+
+  // Hours, Minutes, Seconds, Milliseconds for time and lap time:
+  var timeHours, timeMinutes, timeSeconds, timeCsec;
+  var lapHours, lapMinutes, lapSeconds, lapCsec;
+  // Disable split-Button:
+  $('#split').prop('disabled', true);
+  // When start-Button is clicked:
+  $('#startStop').click(function() {
+    if (mode === 0) {
+      // Set app mode to 1 (on)
+      mode = 1;
+      // Change start-Button to stop-Button
+      $('#startStop').html('<span class="glyphicon glyphicon-stop" aria-hidden="true"></span><span class="sr-only">Stop</span>');
+      $('#startStop').css('background-color', 'rgb(0, 153, 204)');
+      $('#startStop').hover(function() {
+        $(this).css('background-color', 'rgba(0, 115, 153, 1)');
+      }, function() {
+        $(this).css('background-color', 'rgb(0, 153, 204)');
+      });
+      // Change split-Button to enabled
+      $('#split').css('background-color', 'rgba(186, 74, 94, 1)');
+      $('#split').hover(function() {
+        $(this).css('background-color', 'rgba(152, 58, 75, 1)');
+      }, function() {
+        $(this).css('background-color', 'rgba(186, 74, 94, 1)');
+      });
+      $('#split').prop('disabled', false);
+      // Change reset-Button to disabled
+      $('#reset').css({
+        'background-color': 'rgba(51, 51, 51, 0.3)',
+        'color': '#fff'
+      });
+      $('#reset').prop('disabled', true);
+      // start time and lap counters
+      startCounters();
+    } else {
+      // Set app mode to 0 (off)
+      mode = 0;
+      // Change stop-Button to start-Button
+      $('#startStop').html('<span class="glyphicon glyphicon-play" aria-hidden="true"></span><span class="sr-only">Stop</span>');
+      $('#startStop').css("background-color", "rgb(0, 204, 153)");
+      $('#startStop').hover(function() {
+        $(this).css('background-color', 'rgba(0, 153, 115, 1)');
+      }, function() {
+        $(this).css('background-color', 'rgb(0, 204, 153)');
+      });
+      // Change split-Button to disabled
+      $('#split').css('background-color', 'rgba(186, 74, 94, 0.3)');
+      $('#split').prop('disabled', true);
+      // Change reset-Button to enabled
+      $('#reset').css({
+        'background-color': 'rgba(189, 188, 186, 1)',
+        'color': 'rgba(51, 51, 51, 1)'
+      });
+      $('#reset').hover(function() {
+        $(this).css({
+          'background-color': 'rgba(51, 51, 51, 1)',
+          'color': '#fff'
+        });
+      }, function() {
+        $(this).css({
+          'background-color': 'rgba(189, 188, 186, 1)',
+          'color': 'rgba(51, 51, 51, 1)'
+        });
+      });
+      $('#reset').prop('disabled', false);
+      // Stop counters
+      clearInterval(loop);
+    }
+  });
+
+  // When reset-Button is clicked:
+  $('#reset').click(function() {
+    // empty table and hide it:
+    $('#laptimes').empty();
+    $('.table').css('display', 'none');
+    // reset timers:
+    timeCounter = 0;
+    lapCounter = 0;
+    updateTime();
+  });
+
+  // When split-Button is clicked:
+  $('#split').click(function() {
+    // if mode = 1 (on)
+    if (mode = 1) {
+      // stop loop
+      clearInterval(loop);
+      // reset lapCounter
+      lapCounter = 0;
+      // Get current time and date:
+      // Create a date object with new Date() constructor and assign it as value to 'date'
+      date = new Date();
+      // Display table for lap details:
+      $('.table').css('display', 'table');
+      // print lap details:
+      addLapDetails(date);
+      // restart counters:
+      startCounters();
+    }
+  })
+
+  // Functions:
+  // starts time and lap counters and updates time on webpage
+  function startCounters() {
+    loop = setInterval(function() {
+      timeCounter++;
+      lapCounter++;
+      updateTime();
+    }, 10)
+  }
+  // converts counters to hours, minutes, seconds and milliseconds
+  // and updates the times on the webpage
+  function updateTime() {
+    // Conversion ms -> h:min:s:ms
+    // -> /Playground/time-format-converter.js
+    // Here: conversion to Centiseconds
+    // as 1 ms resolution might result in accuracy issues
+    timeCsec = timeCounter % 100;
+    timeHours = Math.floor((timeCounter / 100) / 3600);
+    timeMinutes = Math.floor(((timeCounter / 100) % 3600) / 60);
+    timeSeconds = Math.floor(((timeCounter / 100) % 3600) % 60);
+
+    // Update times on webpage:
+    $('#timeHour').text(format(timeHours));
+    $('#timeMinute').text(format(timeMinutes));
+    $('#timeSec').text(format(timeSeconds));
+    $('#timeCsec').text(format(timeCsec));
+
+    // Same applies to laptimes:
+    lapCsec = lapCounter % 100;
+    lapHours = Math.floor((lapCounter / 100) / 3600);
+    lapMinutes = Math.floor(((lapCounter / 100) % 3600) / 60);
+    lapSeconds = Math.floor(((lapCounter / 100) % 3600) % 60);
+
+    // Update lap times on webpage:
+    $('#lapHour').text(format(lapHours));
+    $('#lapMinute').text(format(lapMinutes));
+    $('#lapSec').text(format(lapSeconds));
+    $('#lapCsec').text(format(lapCsec));
+  }
+
+  // Format numbers to 2 digits:
+  function format(number) {
+    if (number < 10) {
+      return '0' + number;
+    } else {
+      return number;
+    }
+  };
+
+  // Prints lap details into laptime div:
+  function addLapDetails(clock) {
+    lapNumber++;
+    // Lap#, Interval, Total, Time Recorded
+    var interval =
+      '<span>' + format(lapHours) + '</span>' +
+      ':<span>' + format(lapMinutes) + '</span>' +
+      ':<span>' + format(lapSeconds) + '</span>' +
+      ':<span>' + format(lapCsec) + '</span>';
+    var total =
+      '<span>' + format(timeHours) + '</span>' +
+      ':<span>' + format(timeMinutes) + '</span>' +
+      ':<span>' + format(timeSeconds) + '</span>' +
+      ':<span>' + format(timeCsec) + '</span>';
+
+    // Convert current time to date-time-string:
+    var recorded = clock.toUTCString();
+
+    // Create table rows from variables:
+    var lapTimeDetails =
+      '<tr> <td># ' + lapNumber + '</td>' +
+      '<td>' + interval + '</td>' +
+      '<td>' + total + '</td>' +
+      '<td>' + recorded + '</td> </tr>';
+    // Print lap details to the beginning of the list:
+    $(lapTimeDetails).prependTo('#laptimes');
+  }
+
+});
+  </script>
 </html>
